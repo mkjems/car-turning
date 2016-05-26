@@ -1,10 +1,10 @@
 
 Keys = function() {
-    this.key = {
+    this.stateOfKeys = {
         a: 'up',
         s: 'up',
         d: 'up',
-        w: 'up',
+        w: 'up'
     };
 
     document.getElementsByTagName('body')[0].addEventListener('keydown', function(evt) {
@@ -22,9 +22,9 @@ Keys = function() {
             this.stateOfKeys.d = 'down';
             break;
         }
-    },false);
+    }.bind(this),false);
 
-    document.getElementsByTagName('body')[0].addEventListener('keydown', function(evt) {
+    document.getElementsByTagName('body')[0].addEventListener('keyup', function(evt) {
         switch(evt.which) {
         case 65:
             this.stateOfKeys.a = 'up';
@@ -39,7 +39,7 @@ Keys = function() {
             this.stateOfKeys.d = 'up';
             break;
         }
-    },false);
+    }.bind(this),false);
 };
 
 Keys.prototype.getStateOfKeys = function() {

@@ -1,66 +1,69 @@
-var position_x = 100;
-var position_y = 100;
-var wagon_length = 80;
-var half_wagon_length = wagon_length/2;
-var wagon_width = 50;
-var half_wagon_width = wagon_width/2;
-var mass_radius = 7;
-var angle = Math.PI/180 * 107;
-var rear_wheel_radius = 15;
-var rear_wheel_width = 8;
-var front_wheel_radius = 10;
-var front_wheel_width = 6;
-var wheel_rotation = 20;
+function Car (x, y, angle) {
+    this.position_x = x;
+    this.position_y = y;
+    this.angle = Math.PI/180 * angle;
 
-ctx.translate(position_x, position_y);
-ctx.rotate(angle);
+    this.wagon_length = 80;
+    this.half_wagon_length = this.wagon_length/2;
+    this.wagon_width = 50;
+    this.half_wagon_width = this.wagon_width/2;
+    this.mass_radius = 7;
+    this.rear_wheel_radius = 15;
+    this.rear_wheel_width = 8;
+    this.front_wheel_radius = 10;
+    this.front_wheel_width = 6;
+}
 
-ctx.save();
-ctx.scale(1, 1);
+Car.prototype.draw = function(state) {
+    ctx.save();
+    ctx.translate(this.position_x, this.position_y);
+    ctx.scale(0.7, 0.7);
+    ctx.rotate(this.angle);
 
-ctx.beginPath();
-ctx.moveTo(0 , half_wagon_length);
-ctx.lineTo(0, -half_wagon_length);
-ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0 , this.half_wagon_length);
+    ctx.lineTo(0, -this.half_wagon_length);
+    ctx.stroke();
 
-ctx.beginPath();
-ctx.arc(0, 0, mass_radius, 0, 2*Math.PI, false);
-ctx.stroke();
-ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0, 0, this.mass_radius, 0, 2*Math.PI, false);
+    ctx.stroke();
+    ctx.fill();
 
-// Front axel
-ctx.beginPath();
-ctx.moveTo(-half_wagon_width , -half_wagon_length);
-ctx.lineTo(half_wagon_width, -half_wagon_length);
-ctx.stroke();
+    // Front axel
+    ctx.beginPath();
+    ctx.moveTo(-this.half_wagon_width , -this.half_wagon_length);
+    ctx.lineTo(this.half_wagon_width, -this.half_wagon_length);
+    ctx.stroke();
 
-// Rear axel
-ctx.beginPath();
-ctx.moveTo(-half_wagon_width , half_wagon_length);
-ctx.lineTo(half_wagon_width, half_wagon_length);
-ctx.stroke();
+    // Rear axel
+    ctx.beginPath();
+    ctx.moveTo(-this.half_wagon_width , this.half_wagon_length);
+    ctx.lineTo(this.half_wagon_width, this.half_wagon_length);
+    ctx.stroke();
 
-// Left rear wheel
+    // Left rear wheel
 
-ctx.fillRect(-half_wagon_width - rear_wheel_width , half_wagon_length - rear_wheel_radius, rear_wheel_width, 2*rear_wheel_radius);
+    ctx.fillRect(-this.half_wagon_width - this.rear_wheel_width , this.half_wagon_length - this.rear_wheel_radius, this.rear_wheel_width, 2*this.rear_wheel_radius);
 
-// Right rear wheel
-ctx.fillRect(half_wagon_width, half_wagon_length - rear_wheel_radius, rear_wheel_width, 2*rear_wheel_radius);
+    // Right rear wheel
+    ctx.fillRect(this.half_wagon_width, this.half_wagon_length - this.rear_wheel_radius, this.rear_wheel_width, 2*this.rear_wheel_radius);
 
-ctx.save();
+    ctx.save();
 
-// Left front wheel
-ctx.translate(-half_wagon_width, -half_wagon_length);
-ctx.rotate((Math.PI/180)*wheel_rotation); // rotate
-ctx.fillRect(0 -front_wheel_width, 0 - front_wheel_radius, front_wheel_width, 2*front_wheel_radius);
+    // Left front wheel
+    ctx.translate(-this.half_wagon_width, -this.half_wagon_length);
+    ctx.rotate((Math.PI/180)*state.wheel_rotation); // rotate
+    ctx.fillRect(0 -this.front_wheel_width, 0 - this.front_wheel_radius, this.front_wheel_width, 2*this.front_wheel_radius);
 
-ctx.restore();
-ctx.save();
+    ctx.restore();
+    ctx.save();
 
-// Right front wheel
-ctx.translate(half_wagon_width, -half_wagon_length);
-ctx.rotate((Math.PI/180)*wheel_rotation); // rotate
-ctx.fillRect(0 , - front_wheel_radius, front_wheel_width, 2*front_wheel_radius);
+    // Right front wheel
+    ctx.translate(this.half_wagon_width, -this.half_wagon_length);
+    ctx.rotate((Math.PI/180)*state.wheel_rotation); // rotate
+    ctx.fillRect(0 , - this.front_wheel_radius, this.front_wheel_width, 2*this.front_wheel_radius);
 
-ctx.restore();
-ctx.restore();
+    ctx.restore();
+    ctx.restore();
+}

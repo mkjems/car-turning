@@ -3,36 +3,37 @@
 var canvasElm = document.getElementById("game_canvas");
 var ctx = canvasElm.getContext("2d");
 
-var car_a = new Car(100,100,10);
+var car_a = new Car(200,200,110);
 var car_b = new Car(100,200,-45);
 
 var keys = new Keys();
 
+var state = {
+	wheel_rotation: 0
+};
+
 // Game loop
 
-function getKeyPositions() {
-
+function modifyState(state,keyPositions) {
+	if(keyPositions.a == 'down'){
+		state.wheel_rotation = Math.max(state.wheel_rotation - 3, -55);
+	}
+	if(keyPositions.d == 'down'){
+		state.wheel_rotation = Math.min(state.wheel_rotation + 3, 55);
+	}
 }
 
-function modifyWorld(keyPositions) {
-
-}
-
-function updateWorldState() {
-	keyPositions = getKeyPositions();
-	modifyWorld(keyPositions);
-};
-
-function renderWorld(){
+function renderWorld(state){
 	ctx.clearRect(0, 0, canvasElm.width, canvasElm.height);
-	car_a.draw();
-	car_b.draw();
+	car_a.draw(state);
+	car_b.draw(state);
 };
 
-
+ // The loop
 function step(timestamp) {
-	updateWorldState();
-	renderWorld();
+	keyPositions = keys.getStateOfKeys();
+	modifyState(state,keyPositions);
+	renderWorld(state);
     window.requestAnimationFrame(step);
 }
 
