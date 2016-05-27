@@ -1,5 +1,4 @@
 // Setup
-
 var canvasElm = document.getElementById("game_canvas");
 var ctx = canvasElm.getContext("2d");
 
@@ -7,12 +6,11 @@ var car_a = new Car(200,200,110);
 var car_b = new Car(100,200,-45);
 
 var keys = new Keys();
-
-var state = {
+var store = new Store({
 	wheel_rotation: 0
-};
+});
 
-// Game loop
+/* Game loop */
 
 function modifyState(state,keyPositions) {
 	if(keyPositions.a == 'down'){
@@ -21,6 +19,7 @@ function modifyState(state,keyPositions) {
 	if(keyPositions.d == 'down'){
 		state.wheel_rotation = Math.min(state.wheel_rotation + 3, 55);
 	}
+	return state;
 }
 
 function renderWorld(state){
@@ -29,13 +28,13 @@ function renderWorld(state){
 	car_b.draw(state);
 };
 
- // The loop
+// The loop
 function step(timestamp) {
 	keyPositions = keys.getStateOfKeys();
-	modifyState(state,keyPositions);
-	renderWorld(state);
+	var newState = modifyState(store.getCurrentState(),keyPositions);
+	renderWorld(newState);
+	store.preserveState(newState);
     window.requestAnimationFrame(step);
 }
 
 window.requestAnimationFrame(step);
-
