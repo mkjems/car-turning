@@ -9,3 +9,5 @@ Store.prototype.getCurrentState = function() {
 Store.prototype.preserveState = function(newState) {
 	this.state = newState;
 }
+
+module.exports = Store;

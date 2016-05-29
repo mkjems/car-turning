@@ -14,7 +14,7 @@ function Car (x, y, angle) {
     this.front_wheel_width = 6;
 }
 
-Car.prototype.draw = function(state) {
+Car.prototype.draw = function(state, ctx) {
     ctx.save();
     ctx.translate(this.position_x, this.position_y);
     ctx.scale(0.7, 0.7);
@@ -67,3 +67,5 @@ Car.prototype.draw = function(state) {
     ctx.restore();
     ctx.restore();
 }
+
+module.exports = Car;

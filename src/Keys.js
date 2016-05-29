@@ -1,5 +1,4 @@
-
-Keys = function() {
+function Keys() {
     this.stateOfKeys = {
         a: 'up',
         s: 'up',
@@ -40,8 +39,20 @@ Keys = function() {
             break;
         }
     }.bind(this),false);
-};
-
-Keys.prototype.getStateOfKeys = function() {
-    return Object.assign({}, this.stateOfKeys);
 }
+
+Keys.prototype.getActions = function() {
+    var actions = [];
+    for (var keyName in this.stateOfKeys) {
+        if(this.stateOfKeys[keyName] == 'down'){
+            actions.push({
+                type: 'KEY_DOWN',
+                key: keyName
+            });
+        }
+    }
+    return actions;
+}
+
+module.exports = Keys;
+

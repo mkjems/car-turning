@@ -1,0 +1,15 @@
+{
+  "name": "car-turning",
+  "version": "1.0.0",
+  "description": "Trying to figure out how to make a car turn in a natural way",
+  "main": "game.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "mkjems",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^2.11.0",
+    "webpack": "^1.13.1"
+  }
+}
