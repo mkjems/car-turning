@@ -1,23 +1,23 @@
-function Timer() {
-	this.lastT1 = 0;
-	this.t1;
-	this.t2;
-	this.frameLength;
-	this.mycodeTime;
-	this.timeUsage;
+var lastT1 = 0;
+var t1;
+var t2;
+var frameLength;
+var mycodeTime;
+var timeUsage;
+
+exports.FrameBegin = function(){
+	t1 = new Date().getTime();
+	frameLength = t1 - lastT1;
 }
 
-Timer.prototype.FrameBegin = function(){
-	this.t1 = new Date().getTime();
-	this.frameLength = this.t1 - this.lastT1;
+exports.FrameEnd = function(){
+	t2 = new Date().getTime();
+	mycodeTime = t2 - t1;
+	timeUsage = (mycodeTime*100)/frameLength;
+	//console.log(timeUsage);
+	lastT1 = t1;
 }
 
-Timer.prototype.FrameEnd = function(){
-	this.t2 = new Date().getTime();
-	this.mycodeTime = this.t2 - this.t1;
-	this.timeUsage = (this.mycodeTime*100)/this.frameLength;
-	// console.log(this.timeUsage);
-	this.lastT1 = this.t1;
-}
-
-module.exports = Timer;
+exports.getTimeUsage = function() {
+	return timeUsage;
+};

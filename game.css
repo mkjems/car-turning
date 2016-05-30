@@ -1,3 +1,7 @@
 #game_canvas {
 	border: solid 1px #000;
 }
+
+#stats_canvas {
+	border: solid 1px #000;
+}

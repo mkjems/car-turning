@@ -16,9 +16,9 @@ function Car (x, y, angle) {
 
 Car.prototype.draw = function(state, ctx) {
     ctx.save();
-    ctx.translate(this.position_x, this.position_y);
+    ctx.translate(state.position_x, state.position_y);
     ctx.scale(0.7, 0.7);
-    ctx.rotate(this.angle);
+    ctx.rotate(state.angle);
 
     ctx.beginPath();
     ctx.moveTo(0 , this.half_wagon_length);

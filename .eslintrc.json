@@ -13,6 +13,7 @@
     },
     "globals": {
         "require": 1,
-        "module": 1
+        "module": 1,
+        "exports": 1
     }
 }
