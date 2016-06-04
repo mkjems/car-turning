@@ -14,6 +14,7 @@
     "globals": {
         "require": 1,
         "module": 1,
-        "exports": 1
+        "exports": 1,
+        "Victor": 1
     }
 }

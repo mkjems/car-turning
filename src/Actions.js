@@ -9,9 +9,7 @@ exports.getActionsList = function() {
 	// Add the user keys
 	actions = actions.concat(keys.getActions());
 	// Things that should be done every frame.
-	actions.push({
-		type: 'MOVE_CARS'
-	});
+
 	actions.push({
 		type: 'UPDATE_STATS'
 	});

@@ -1,8 +1,9 @@
 var Store = require('./Store.js');
 var Actions = require('./Actions.js');
 var generateNewState = require('./generateNewState.js');
-var timer = require('./timer.js');
 var View = require('./View.js');
+
+var timer = require('./timer.js');
 
 var store = new Store();
 
