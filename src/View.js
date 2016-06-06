@@ -20,7 +20,7 @@ function clearFrame() {
 
 function drawCars(state) {
 	exports.cars[0].draw(state.cars[0], ctx);
-	exports.cars[1].draw(state.cars[1], ctx);
+	//exports.cars[1].draw(state.cars[1], ctx);
 	// ray.draw(ctx, 0, canvasElm.width);
 	// ray2.draw(ctx, 0, canvasElm.width);
 }

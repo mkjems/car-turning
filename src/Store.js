@@ -4,7 +4,7 @@ function Store(){
 			wheel_rotation: (Math.PI/180)*0,
 			x:200,
 			y: 400,
-			angle: (Math.PI/180)*320,
+			angle: (Math.PI/180)*0,
 			velocity: 0
 		},{
 			wheel_rotation: (Math.PI/180)*0,
