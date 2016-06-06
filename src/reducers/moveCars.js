@@ -11,7 +11,7 @@ module.exports = function(state, action) {
     state.cars[0].velocity = Math.max(state.cars[0].velocity -0.05, 0);
 
     // find next position
-    if(stateCar.wheel_rotation > -.1 && stateCar.wheel_rotation < .1){
+    if( Math.abs(stateCar.wheel_rotation) < .1 ){
         var vec = Victor(Math.abs(stateCar.velocity) , 0);
         vec.rotateBy((stateCar.velocity < 0 ? Math.PI: 0)-(Math.PI/2) + stateCar.angle);
         state.cars[0].x += vec.x

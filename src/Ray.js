@@ -1,4 +1,4 @@
-
+// A Ray is a representation of a straight line.
 // y = a + bx
 function Ray(a,b) {
 	this.a = a;
@@ -24,7 +24,8 @@ exports.rayfromVectorAndPoint = function(vec, point){
 };
 
 exports.intersection = function(ray1,ray2){
-	if(ray1.b - ray2.b === 0){
+	if( Math.abs(ray1.b - ray2.b) < .01){
+		console.log('parallel lines');
 		return false;
 	}
 	var x = (ray2.a - ray1.a) / (ray1.b - ray2.b);

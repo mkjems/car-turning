@@ -1,7 +1,4 @@
 var actions = require('./Actions.js');
-// var rayfromVectorAndPoint = require('./Ray.js').rayfromVectorAndPoint;
-// var intersection = require('./Ray.js').intersection;
-// var Victor = require('victor');
 
 function Car (x, y, angle) {
     this.x = x;
@@ -73,40 +70,6 @@ Car.prototype.draw = function(state, ctx) {
 
         ctx.restore();
     ctx.restore();
-
-    // Line perpendicular to front wheel
-    // var vec = Victor(state.x, state.y)
-    //     .add( Victor(( state.wheel_rotation < 0 ? -1 : 1) * this.half_wagon_width, -this.half_wagon_length).rotate(state.angle) );
-    // var frontWheelRay = rayfromVectorAndPoint(Victor(200,0).rotate(state.wheel_rotation).rotate(state.angle),{
-    //     x:vec.x,
-    //     y:vec.y
-    // });
-
-    // Line perpendicular to rear wheel
-    // var vec3 = Victor(state.x, state.y)
-    //     .add( Victor(0, this.half_wagon_length).rotate(state.angle) );
-    // var rearWheelRay = rayfromVectorAndPoint(Victor(200,0).rotate(state.angle),{
-    //     x:vec3.x,
-    //     y:vec3.y
-    // });
-
-    // var turnRadiusCenter = intersection(frontWheelRay, rearWheelRay);
-
-    // ctx.save();
-    //     if(turnRadiusCenter) {
-
-            // var v4 = Victor((state.x - turnRadiusCenter.x), (state.y - turnRadiusCenter.y));
-
-            // ctx.beginPath();
-            // ctx.arc(turnRadiusCenter.x, turnRadiusCenter.y, v4.length(), 0, 2*Math.PI, false);
-            // ctx.stroke();
-            // ctx.beginPath();
-            // ctx.arc(turnRadiusCenter.x, turnRadiusCenter.y, 1, 0, 2*Math.PI, false);
-            // ctx.stroke();
-    //     }
-    // ctx.restore();
-
-
 
     actions.emmitEvent({
         type: 'MOVE_CARS',
