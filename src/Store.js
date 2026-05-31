@@ -2,6 +2,7 @@ function Store(){
 	this.state = {
 		cars : [{
 			gear: 'forwards',
+			wheelBase: 40,
 			wheel_rotation: (Math.PI/180)*0,
 			x:200,
 			y: 400,
@@ -15,6 +16,7 @@ function Store(){
 			mass: 100
 		},{
 			gear: 'forwards',
+			wheelBase: 40,
 			wheel_rotation: (Math.PI/180)*0,
 			x:100,
 			y:200,

@@ -7,38 +7,54 @@ function Keys() {
     };
 
     document.getElementsByTagName('body')[0].addEventListener('keydown', function(evt) {
-        switch(evt.which) {
-        case 37:
+        switch(evt.key) {
+        case 'ArrowLeft':
+            evt.preventDefault();
             this.stateOfKeys.ArrowLeft = 'down';
             break;
-        case 40:
+        case 'ArrowDown':
+            evt.preventDefault();
             this.stateOfKeys.ArrowDown = 'down';
             break;
-        case 38:
+        case 'ArrowUp':
+            evt.preventDefault();
             this.stateOfKeys.ArrowUp = 'down';
             break;
-        case 39:
+        case 'ArrowRight':
+            evt.preventDefault();
             this.stateOfKeys.ArrowRight = 'down';
             break;
         }
     }.bind(this),false);
 
     document.getElementsByTagName('body')[0].addEventListener('keyup', function(evt) {
-        switch(evt.which) {
-        case 37:
+        switch(evt.key) {
+        case 'ArrowLeft':
+            evt.preventDefault();
             this.stateOfKeys.ArrowLeft = 'up';
             break;
-        case 40:
+        case 'ArrowDown':
+            evt.preventDefault();
             this.stateOfKeys.ArrowDown = 'up';
             break;
-        case 38:
+        case 'ArrowUp':
+            evt.preventDefault();
             this.stateOfKeys.ArrowUp = 'up';
             break;
-        case 39:
+        case 'ArrowRight':
+            evt.preventDefault();
             this.stateOfKeys.ArrowRight = 'up';
             break;
         }
     }.bind(this),false);
+}
+
+Keys.prototype.getControls = function() {
+    return {
+        steer: (this.stateOfKeys.ArrowRight == 'down' ? 1 : 0) - (this.stateOfKeys.ArrowLeft == 'down' ? 1 : 0),
+        throttle: this.stateOfKeys.ArrowUp == 'down' ? 1 : 0,
+        brake: this.stateOfKeys.ArrowDown == 'down' ? 1 : 0
+    };
 }
 
 Keys.prototype.getActions = function() {

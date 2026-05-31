@@ -1,5 +1,3 @@
-var actions = require('./Actions.js');
-
 function Car (x, y, angle) {
     this.x = x;
     this.y = y;
@@ -78,11 +76,6 @@ Car.prototype.draw = function(state, ctx) {
 
         ctx.restore();
     ctx.restore();
-
-    actions.emmitEvent({
-        type: 'MOVE_CARS',
-        car: this
-    });
 }
 
 module.exports = Car;
