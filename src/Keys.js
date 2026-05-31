@@ -1,41 +1,41 @@
 function Keys() {
     this.stateOfKeys = {
-        a: 'up',
-        s: 'up',
-        d: 'up',
-        w: 'up'
+        ArrowLeft: 'up',
+        ArrowDown: 'up',
+        ArrowRight: 'up',
+        ArrowUp: 'up'
     };
 
     document.getElementsByTagName('body')[0].addEventListener('keydown', function(evt) {
         switch(evt.which) {
-        case 65:
-            this.stateOfKeys.a = 'down';
+        case 37:
+            this.stateOfKeys.ArrowLeft = 'down';
             break;
-        case 83:
-            this.stateOfKeys.s = 'down';
+        case 40:
+            this.stateOfKeys.ArrowDown = 'down';
             break;
-        case 87:
-            this.stateOfKeys.w = 'down';
+        case 38:
+            this.stateOfKeys.ArrowUp = 'down';
             break;
-        case 68:
-            this.stateOfKeys.d = 'down';
+        case 39:
+            this.stateOfKeys.ArrowRight = 'down';
             break;
         }
     }.bind(this),false);
 
     document.getElementsByTagName('body')[0].addEventListener('keyup', function(evt) {
         switch(evt.which) {
-        case 65:
-            this.stateOfKeys.a = 'up';
+        case 37:
+            this.stateOfKeys.ArrowLeft = 'up';
             break;
-        case 83:
-            this.stateOfKeys.s = 'up';
+        case 40:
+            this.stateOfKeys.ArrowDown = 'up';
             break;
-        case 87:
-            this.stateOfKeys.w = 'up';
+        case 38:
+            this.stateOfKeys.ArrowUp = 'up';
             break;
-        case 68:
-            this.stateOfKeys.d = 'up';
+        case 39:
+            this.stateOfKeys.ArrowRight = 'up';
             break;
         }
     }.bind(this),false);

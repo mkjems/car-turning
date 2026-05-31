@@ -1,52 +1,60 @@
 var Victor = require('victor');
-var rayfromVectorAndPoint = require('../Ray.js').rayfromVectorAndPoint;
-var intersection = require('../Ray.js').intersection;
+var ENGINE_DECAY = 0.06;
+var ACCELERATION = 0.18;
+var MAX_FORWARD_SPEED = 8;
+var MAX_REVERSE_SPEED = -3;
+var FORWARD_DRAG = 0.985;
+var LATERAL_GRIP = 0.68;
+var STEERING_GRIP = 0.92;
+
+function moveTowardsZero(value, delta) {
+    if (value > 0) {
+        return Math.max(0, value - delta);
+    }
+
+    if (value < 0) {
+        return Math.min(0, value + delta);
+    }
+
+    return value;
+}
 
 module.exports = function(state, action) {
     var stateCar = state.cars[0];
-    var actionCar = action.car;
+    var wheelBase = action.car.wagon_length;
+    var velocityVec = Victor.fromObject(stateCar.velocityVector);
+    var forward = Victor(0, -1).rotate(stateCar.angle);
+    var right = Victor(1, 0).rotate(stateCar.angle);
+    var forwardSpeed = velocityVec.dot(forward);
+    var lateralSpeed = velocityVec.dot(right);
+    var nextEnginePower = moveTowardsZero(stateCar.enginePower, ENGINE_DECAY);
+    var nextForwardSpeed = forwardSpeed + (nextEnginePower * ACCELERATION);
+    var yawRate;
+    var nextVelocity;
 
+    nextForwardSpeed *= FORWARD_DRAG;
+    nextForwardSpeed = Math.min(nextForwardSpeed, MAX_FORWARD_SPEED);
+    nextForwardSpeed = Math.max(nextForwardSpeed, MAX_REVERSE_SPEED);
 
-    // Slow down, (simulate inertia)
-    state.cars[0].velocity = Math.max(state.cars[0].velocity -0.05, 0);
+    lateralSpeed *= LATERAL_GRIP;
 
-    // find next position
-    if( Math.abs(stateCar.wheel_rotation) < .1 ){
-        var vec = Victor(Math.abs(stateCar.velocity) , 0);
-        vec.rotateBy((stateCar.velocity < 0 ? Math.PI: 0)-(Math.PI/2) + stateCar.angle);
-        state.cars[0].x += vec.x
-        state.cars[0].y += vec.y
-    } else {
-        // Line perpendicular to front wheel
-        var FrontWheelVec = Victor(stateCar.x, stateCar.y)
-            .add( Victor(( stateCar.wheel_rotation < 0 ? -1 : 1) * actionCar.half_wagon_width, -actionCar.half_wagon_length).rotate(stateCar.angle) );
-        var frontWheelRay = rayfromVectorAndPoint(Victor(200,0).rotate(stateCar.wheel_rotation).rotate(stateCar.angle),{
-            x:FrontWheelVec.x,
-            y:FrontWheelVec.y
-        });
-        // Line perpendicular to rear wheel
-        var vec3 = Victor(stateCar.x, stateCar.y)
-            .add( Victor(0, actionCar.half_wagon_length).rotate(stateCar.angle) );
-        var rearWheelRay = rayfromVectorAndPoint(Victor(200,0).rotate(stateCar.angle),{
-            x:vec3.x,
-            y:vec3.y
-        });
-        // Turn radius center
-        var turnRadiusCenter = intersection(frontWheelRay, rearWheelRay);
-        if(turnRadiusCenter) {
-            var v4 = Victor((stateCar.x - turnRadiusCenter.x), (stateCar.y - turnRadiusCenter.y));
-
-            var circumfrence = 2 * v4.length() * Math.PI;
-            var angleDelta = (stateCar.velocity !== 0) ? (stateCar.wheel_rotation < 0 ? -1: 1) * ((stateCar.velocity*10)/circumfrence) : 0 ;
-
-            var v5 = Victor(turnRadiusCenter.x, turnRadiusCenter.y)
-                .add(v4.rotate( angleDelta));
-
-            state.cars[0].x = v5.x;
-            state.cars[0].y = v5.y;
-            state.cars[0].angle += angleDelta;
-        }
-
+    yawRate = 0;
+    if (Math.abs(stateCar.wheel_rotation) > 0.001 && Math.abs(nextForwardSpeed) > 0.001) {
+        yawRate = (nextForwardSpeed / wheelBase) * Math.tan(stateCar.wheel_rotation) * STEERING_GRIP;
     }
+
+    stateCar.angle += yawRate;
+    stateCar.angularVelocity = yawRate;
+    stateCar.enginePower = nextEnginePower;
+
+    forward = Victor(0, -1).rotate(stateCar.angle);
+    right = Victor(1, 0).rotate(stateCar.angle);
+    nextVelocity = forward.multiplyScalar(nextForwardSpeed).add(right.multiplyScalar(lateralSpeed));
+
+    stateCar.velocityVector.x = nextVelocity.x;
+    stateCar.velocityVector.y = nextVelocity.y;
+    stateCar.x += nextVelocity.x;
+    stateCar.y += nextVelocity.y;
+
     return state;
 };

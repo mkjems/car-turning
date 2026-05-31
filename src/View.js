@@ -19,6 +19,7 @@ function clearFrame() {
 }
 
 function drawCars(state) {
+	exports.cars[0].erase(state.cars[0], ctx);
 	exports.cars[0].draw(state.cars[0], ctx);
 	//exports.cars[1].draw(state.cars[1], ctx);
 	// ray.draw(ctx, 0, canvasElm.width);
@@ -38,7 +39,7 @@ function drawStats(state) {
 
 // Render everything
 exports.renderFrame = function(state) {
-	clearFrame();
-	drawStats(state);
+	//clearFrame();
+	//drawStats(state);
 	drawCars(state);
 };

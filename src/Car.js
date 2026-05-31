@@ -7,13 +7,21 @@ function Car (x, y, angle) {
 
     this.wagon_length = 40;
     this.half_wagon_length = this.wagon_length/2;
-    this.wagon_width = 28;
+    this.wagon_width = 25;
     this.half_wagon_width = this.wagon_width/2;
     this.mass_radius = 3;
-    this.rear_wheel_radius = 8;
-    this.rear_wheel_width = 6;
+    this.rear_wheel_radius = 7;
+    this.rear_wheel_width = 4;
     this.front_wheel_radius = 6;
     this.front_wheel_width = 3;
+}
+
+Car.prototype.erase = function(state, ctx) {
+    ctx.save();
+    ctx.translate(state.x, state.y);
+    ctx.rotate(state.angle);
+    ctx.clearRect(- (this.half_wagon_width +25) , - (this.half_wagon_length + 25) , this.wagon_width +50 , this.wagon_length + 50);
+    ctx.restore();
 }
 
 // Car is drawn pointing upwards
