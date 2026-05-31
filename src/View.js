@@ -1,12 +1,12 @@
-var Car =require('./Car.js');
-var track = require('./track/track.js');
+import Car from './Car.js';
+import * as track from './track/track.js';
 
 // Setup
 var canvasElm = document.getElementById("game_canvas");
 
 var ctx = canvasElm.getContext("2d");
 
-exports.cars = [];
+var carRenderers = [];
 
 
 function clearFrame() {
@@ -15,8 +15,8 @@ function clearFrame() {
 }
 
 function ensureCarRenderers(cars) {
-	while (exports.cars.length < cars.length) {
-		exports.cars.push(new Car());
+	while (carRenderers.length < cars.length) {
+		carRenderers.push(new Car());
 	}
 }
 
@@ -87,7 +87,7 @@ function drawCars(state) {
 	ensureCarRenderers(state.cars);
 
 	for (index = 0; index < state.cars.length; index += 1) {
-		exports.cars[index].draw(state.cars[index], ctx);
+		carRenderers[index].draw(state.cars[index], ctx);
 	}
 }
 
@@ -108,9 +108,11 @@ function drawHud(state) {
 
 
 // Render everything
-exports.renderFrame = function(state) {
+function renderFrame(state) {
 	clearFrame();
 	drawTrack(state.track);
 	drawCars(state);
 	drawHud(state);
-};
+}
+
+export { carRenderers, renderFrame };

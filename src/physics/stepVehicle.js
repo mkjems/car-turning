@@ -1,4 +1,4 @@
-var Victor = require('victor');
+import Victor from 'victor';
 
 var MAX_STEER_ANGLE = Math.PI / 4;
 var STEER_SPEED = Math.PI * 1.8;
@@ -29,7 +29,7 @@ function moveTowards(current, target, maxDelta) {
     return current;
 }
 
-module.exports = function stepVehicle(car, controls, dt) {
+export default function stepVehicle(car, controls, dt) {
     var velocityVec = Victor.fromObject(car.velocityVector);
     var forward = Victor(0, -1).rotate(car.angle);
     var right = Victor(1, 0).rotate(car.angle);
@@ -80,4 +80,4 @@ module.exports = function stepVehicle(car, controls, dt) {
     car.velocityVector.y = nextVelocity.y;
     car.x += nextVelocity.x * dt;
     car.y += nextVelocity.y * dt;
-};
+}

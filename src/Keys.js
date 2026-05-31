@@ -57,5 +57,4 @@ Keys.prototype.getControls = function() {
     };
 }
 
-module.exports = Keys;
-
+export default Keys;

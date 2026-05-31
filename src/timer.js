@@ -5,12 +5,12 @@ var frameLength;
 var mycodeTime;
 var timeUsage;
 
-exports.FrameBegin = function(){
+function FrameBegin(){
 	t1 = new Date().getTime();
 	frameLength = t1 - lastT1;
 }
 
-exports.FrameEnd = function(){
+function FrameEnd(){
 	t2 = new Date().getTime();
 	mycodeTime = t2 - t1;
 	timeUsage = (mycodeTime*100)/frameLength;
@@ -18,6 +18,8 @@ exports.FrameEnd = function(){
 	lastT1 = t1;
 }
 
-exports.getTimeUsage = function() {
+function getTimeUsage() {
 	return timeUsage;
-};
+}
+
+export { FrameBegin, FrameEnd, getTimeUsage };

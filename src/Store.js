@@ -1,4 +1,4 @@
-var track = require('./track/track.js');
+import * as track from './track/track.js';
 
 function createCar(name, color, placement, mass) {
 	return {
@@ -52,4 +52,4 @@ Store.prototype.preserveState = function(newState) {
 	this.state = newState;
 }
 
-module.exports = Store;
+export default Store;

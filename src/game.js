@@ -1,11 +1,11 @@
-var Store = require('./Store.js');
-var Keys = require('./Keys.js');
-var getAIControls = require('./ai/getAIControls.js');
-var stepVehicle = require('./physics/stepVehicle.js');
-var track = require('./track/track.js');
-var View = require('./View.js');
+import Store from './Store.js';
+import Keys from './Keys.js';
+import getAIControls from './ai/getAIControls.js';
+import stepVehicle from './physics/stepVehicle.js';
+import * as track from './track/track.js';
+import * as View from './View.js';
 
-var timer = require('./timer.js');
+import * as timer from './timer.js';
 
 var store = new Store();
 var keys = new Keys();

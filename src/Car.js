@@ -99,4 +99,4 @@ Car.prototype.draw = function(state, ctx) {
     ctx.restore();
 }
 
-module.exports = Car;
+export default Car;

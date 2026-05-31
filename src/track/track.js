@@ -199,11 +199,11 @@ function createPlacement(track, progress, lateralOffset) {
     };
 }
 
-module.exports = {
-    createTrack: createTrack,
-    createPlacement: createPlacement,
-    getClosestProgress: getClosestProgress,
-    getHeadingAtDistance: getHeadingAtDistance,
-    getPointAtDistance: getPointAtDistance,
-    syncCarToTrack: syncCarToTrack
+export {
+    createTrack,
+    createPlacement,
+    getClosestProgress,
+    getHeadingAtDistance,
+    getPointAtDistance,
+    syncCarToTrack
 };

@@ -15,17 +15,14 @@ Ray.prototype.draw = function(ctx, x, x2) {
     ctx.stroke();
 };
 
-exports.Ray = Ray;
-
-exports.rayfromVectorAndPoint = function(vec, point){
+function rayfromVectorAndPoint(vec, point){
 	var b = vec.y/vec.x;
 	var a = point.y - (point.x * b);
 	return new Ray(a,b);
-};
+}
 
-exports.intersection = function(ray1,ray2){
+function intersection(ray1,ray2){
 	if( Math.abs(ray1.b - ray2.b) < .01){
-		console.log('parallel lines');
 		return false;
 	}
 	var x = (ray2.a - ray1.a) / (ray1.b - ray2.b);
@@ -33,4 +30,6 @@ exports.intersection = function(ray1,ray2){
 		x: x,
 		y: ray1.valueForX(x)
 	}
-};
+}
+
+export { Ray, rayfromVectorAndPoint, intersection };

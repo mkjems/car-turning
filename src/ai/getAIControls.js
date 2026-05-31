@@ -1,4 +1,4 @@
-var track = require('../track/track.js');
+import * as track from '../track/track.js';
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -18,7 +18,7 @@ function wrapAngle(angle) {
     return wrapped;
 }
 
-module.exports = function getAIControls(car, raceTrack) {
+export default function getAIControls(car, raceTrack) {
     var closest = track.getClosestProgress(raceTrack, car);
     var speed = Math.sqrt((car.velocityVector.x * car.velocityVector.x) + (car.velocityVector.y * car.velocityVector.y));
     var lookAhead = 90 + (speed * 0.45);
@@ -50,4 +50,4 @@ module.exports = function getAIControls(car, raceTrack) {
     }
 
     return controls;
-};
+}
