@@ -57,18 +57,5 @@ Keys.prototype.getControls = function() {
     };
 }
 
-Keys.prototype.getActions = function() {
-    var actions = [];
-    for (var keyName in this.stateOfKeys) {
-        if(this.stateOfKeys[keyName] == 'down'){
-            actions.push({
-                type: 'KEY_DOWN',
-                key: keyName
-            });
-        }
-    }
-    return actions;
-}
-
 module.exports = Keys;
 

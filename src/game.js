@@ -1,6 +1,8 @@
 var Store = require('./Store.js');
 var Keys = require('./Keys.js');
+var getAIControls = require('./ai/getAIControls.js');
 var stepVehicle = require('./physics/stepVehicle.js');
+var track = require('./track/track.js');
 var View = require('./View.js');
 
 var timer = require('./timer.js');
@@ -12,8 +14,27 @@ var MAX_FRAME_TIME = 0.1;
 var accumulator = 0;
 var previousTimestamp;
 
+function updateRaceOrder(state) {
+	var orderedCars = state.cars.slice().sort(function(a, b) {
+		return b.raceDistance - a.raceDistance;
+	});
+	var index;
+
+	for (index = 0; index < orderedCars.length; index += 1) {
+		orderedCars[index].place = index + 1;
+	}
+
+	state.stats.leader = orderedCars[0].name;
+}
+
 function updateWorld(state, dt) {
 	stepVehicle(state.cars[0], keys.getControls(), dt);
+	track.syncCarToTrack(state.cars[0], state.track);
+
+	stepVehicle(state.cars[1], getAIControls(state.cars[1], state.track), dt);
+	track.syncCarToTrack(state.cars[1], state.track);
+
+	updateRaceOrder(state);
 }
 
 /* Game loop */
