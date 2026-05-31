@@ -40,8 +40,13 @@ module.exports = function getAIControls(car, raceTrack) {
     };
 
     if (closest.distance > raceTrack.halfWidth * 0.5) {
-        controls.throttle = 0;
-        controls.brake = 1;
+        var recoveryPoint = track.getPointAtDistance(raceTrack, closest.progress + 28);
+        var recoveryAngle = Math.atan2(recoveryPoint.y - car.y, recoveryPoint.x - car.x) + (Math.PI / 2);
+        var recoveryError = wrapAngle(recoveryAngle - car.angle);
+
+        controls.steer = clamp(recoveryError / (Math.PI / 4), -1, 1);
+        controls.throttle = 1;
+        controls.brake = speed > 120 && Math.abs(recoveryError) > 0.45 ? 1 : 0;
     }
 
     return controls;

@@ -1,17 +1,24 @@
 function createTrack() {
     var points = [];
-    var samples = 80;
+    var samples = 120;
     var index;
     var angle;
-    var radiusScale;
+    var baseRadius;
+    var xRadius;
+    var yRadius;
     var x;
     var y;
 
     for (index = 0; index < samples; index += 1) {
         angle = (index / samples) * Math.PI * 2;
-        radiusScale = 1 + (0.12 * Math.sin(angle * 2));
-        x = 600 + (Math.cos(angle) * 260 * radiusScale);
-        y = 400 + (Math.sin(angle) * 170 * (1 - (0.08 * Math.cos(angle * 2))));
+        baseRadius = 1
+            + (0.18 * Math.sin((angle * 2) - 0.35))
+            + (0.09 * Math.cos((angle * 3) + 1.1))
+            + (0.05 * Math.sin((angle * 5) - 0.7));
+        xRadius = 255 * baseRadius * (1 + (0.08 * Math.cos((angle * 4) + 0.4)));
+        yRadius = 165 * baseRadius * (1 - (0.14 * Math.sin((angle * 3) - 0.9)));
+        x = 600 + (Math.cos(angle) * xRadius) + (28 * Math.sin((angle * 3) + 0.2));
+        y = 400 + (Math.sin(angle) * yRadius) + (18 * Math.cos((angle * 4) - 0.5));
         points.push({ x: x, y: y });
     }
 
