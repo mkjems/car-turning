@@ -53,7 +53,7 @@ function drawTrack(trackState) {
 			}
 		}
 		ctx.closePath();
-		ctx.strokeStyle = '#2f3437';
+		ctx.strokeStyle = '#5f6870';
 		ctx.lineWidth = trackState.halfWidth * 2;
 		ctx.stroke();
 
