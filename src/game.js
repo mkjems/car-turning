@@ -6,8 +6,6 @@ import stepVehicle from './physics/stepVehicle.js';
 import * as track from './track/track.js';
 import * as View from './View.js';
 
-// The track and cars are laid out in a 1200 x 800 world, scaled to fit the canvas
-var WORLD_WIDTH = 1200;
 var FIXED_TIMESTEP = 1 / 120;
 var MAX_FRAME_TIME = 0.1;
 
@@ -63,7 +61,6 @@ export default function createGame(canvas, keyTarget) {
 		}
 
 		state.stats.focused = keyTarget.matches(':focus');
-		ctx.setTransform(canvas.width / WORLD_WIDTH, 0, 0, canvas.width / WORLD_WIDTH, 0, 0);
 		View.renderFrame(ctx, state);
 		store.preserveState(state);
 		frameId = window.requestAnimationFrame(step);

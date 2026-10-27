@@ -30,7 +30,7 @@ The game is a web component, `<car-race>`. GitHub Pages publishes it on every pu
 </section>
 ```
 
-It fills the width of its container (up to 1200px) and keeps a 3:2 shape. Click it to give it focus, then drive. Arrow keys only steer while it has focus, so the rest of the page scrolls normally. It pauses while scrolled out of view.
+It fills the full width of its container and keeps a wide 5:2 shape, with the track centred. Click it to give it focus, then drive. Arrow keys only steer while it has focus, so the rest of the page scrolls normally. It pauses while scrolled out of view.
 
 ## Controls
 

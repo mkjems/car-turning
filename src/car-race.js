@@ -1,4 +1,5 @@
 import createGame from './game.js';
+import { VIEW_WIDTH, VIEW_HEIGHT } from './View.js';
 
 var template = document.createElement('template');
 template.innerHTML = `
@@ -17,10 +18,10 @@ template.innerHTML = `
 			display: block;
 			width: 100%;
 			height: auto;
-			aspect-ratio: 3 / 2;
+			aspect-ratio: ${VIEW_WIDTH} / ${VIEW_HEIGHT};
 		}
 	</style>
-	<canvas width="1200" height="800" part="canvas"></canvas>
+	<canvas width="${VIEW_WIDTH}" height="${VIEW_HEIGHT}" part="canvas"></canvas>
 `;
 
 // <car-race></car-race>: click it, then drive with the arrow keys
@@ -52,7 +53,7 @@ class CarRace extends HTMLElement {
 
 			if (pixelWidth > 0 && pixelWidth !== canvas.width) {
 				canvas.width = pixelWidth;
-				canvas.height = Math.round(pixelWidth * 2 / 3);
+				canvas.height = Math.round(pixelWidth * VIEW_HEIGHT / VIEW_WIDTH);
 			}
 		});
 		this.resizeObserver.observe(canvas);
