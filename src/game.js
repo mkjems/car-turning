@@ -60,7 +60,6 @@ export default function createGame(canvas, keyTarget) {
 			accumulator -= FIXED_TIMESTEP;
 		}
 
-		state.stats.focused = keyTarget.matches(':focus');
 		View.renderFrame(ctx, state);
 		store.preserveState(state);
 		frameId = window.requestAnimationFrame(step);

@@ -4,12 +4,9 @@ import * as track from './track/track.js';
 // The car renderer holds only drawing dimensions, so every car (and every game) can share it
 var carRenderer = new Car();
 
-// The track lives in a 1200 x 800 world. The canvas shows a wider, shorter area with the
-// world centred in it, so the track sits smaller inside a wide, low canvas.
-var WORLD_WIDTH = 1200;
-var WORLD_HEIGHT = 800;
-var VIEW_WIDTH = 2400;
-var VIEW_HEIGHT = 960;
+// The track and cars are laid out in a 1200 x 800 world, scaled to fit the canvas
+var VIEW_WIDTH = 1200;
+var VIEW_HEIGHT = 800;
 
 function clearFrame(ctx) {
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -89,7 +86,7 @@ function drawHud(ctx, state) {
 		ctx.fillText('Leader: ' + state.stats.leader, left, top + 50);
 		ctx.fillText('You lap: ' + Math.max(1, state.cars[0].lap + 1), left, top + 70);
 		ctx.fillText('You place: ' + state.cars[0].place + '/' + state.cars.length, left, top + 90);
-		ctx.fillText(state.stats.focused ? 'Arrow keys to drive' : 'Click here to drive', left, top + 110);
+		ctx.fillText('Arrow keys to drive', left, top + 110);
 	ctx.restore();
 }
 
@@ -97,17 +94,12 @@ function drawHud(ctx, state) {
 // Render everything
 function renderFrame(ctx, state) {
 	var viewScale = ctx.canvas.width / VIEW_WIDTH;
-	// Canvas pixels per CSS pixel, so the HUD text stays a readable size at any canvas width
-	var pixelRatio = ctx.canvas.width / (ctx.canvas.clientWidth || ctx.canvas.width);
 
 	clearFrame(ctx);
 
 	ctx.setTransform(viewScale, 0, 0, viewScale, 0, 0);
-	ctx.translate((VIEW_WIDTH - WORLD_WIDTH) / 2, (VIEW_HEIGHT - WORLD_HEIGHT) / 2);
 	drawTrack(ctx, state.track);
 	drawCars(ctx, state);
-
-	ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 	drawHud(ctx, state);
 }
 
