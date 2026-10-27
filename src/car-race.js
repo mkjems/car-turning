@@ -5,17 +5,12 @@ template.innerHTML = `
 	<style>
 		:host {
 			display: block;
-			max-width: 1200px;
 			outline: none;
 			cursor: pointer;
 		}
 
 		:host(:focus) {
 			cursor: default;
-		}
-
-		:host(:focus-visible) {
-			outline: 1px solid #cccccc;
 		}
 
 		canvas {
@@ -35,6 +30,7 @@ class CarRace extends HTMLElement {
 		this.attachShadow({ mode: 'open' }).appendChild(template.content.cloneNode(true));
 		this.game = null;
 		this.visibilityObserver = null;
+		this.resizeObserver = null;
 	}
 
 	connectedCallback() {
@@ -46,7 +42,20 @@ class CarRace extends HTMLElement {
 			this.setAttribute('aria-label', 'Racing game: click, then drive with the arrow keys');
 		}
 
-		this.game = createGame(this.shadowRoot.querySelector('canvas'), this);
+		var canvas = this.shadowRoot.querySelector('canvas');
+
+		this.game = createGame(canvas, this);
+
+		// Give the canvas one pixel per screen pixel at whatever width it's shown, so it stays sharp
+		this.resizeObserver = new ResizeObserver(function() {
+			var pixelWidth = Math.round(canvas.clientWidth * (window.devicePixelRatio || 1));
+
+			if (pixelWidth > 0 && pixelWidth !== canvas.width) {
+				canvas.width = pixelWidth;
+				canvas.height = Math.round(pixelWidth * 2 / 3);
+			}
+		});
+		this.resizeObserver.observe(canvas);
 
 		// Only run while on screen, so it costs nothing when scrolled past on a page
 		this.visibilityObserver = new IntersectionObserver(function(entries) {
@@ -62,6 +71,8 @@ class CarRace extends HTMLElement {
 	disconnectedCallback() {
 		this.visibilityObserver.disconnect();
 		this.visibilityObserver = null;
+		this.resizeObserver.disconnect();
+		this.resizeObserver = null;
 		this.game.destroy();
 		this.game = null;
 	}
