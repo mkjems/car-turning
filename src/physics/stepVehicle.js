@@ -1,8 +1,12 @@
 import Victor from 'victor';
 
 var MAX_STEER_ANGLE = Math.PI / 4;
-var STEER_SPEED = Math.PI * 1.8;
-var STEER_RETURN_SPEED = Math.PI * 2.4;
+// Steering input ramps between -1 and 1 at these rates (per second),
+// so a key press turns the wheels gradually instead of snapping to full lock
+var STEER_SPEED = 2.5;
+var STEER_RETURN_SPEED = 4;
+// The faster the car goes, the less the wheels can turn
+var STEER_SPEED_FALLOFF = 180;
 var ENGINE_ACCELERATION = 260;
 var BRAKE_DECELERATION = 320;
 var COAST_DECELERATION = 42;
@@ -12,6 +16,8 @@ var LATERAL_GRIP = 7.5;
 var STEERING_GRIP = 0.94;
 var MAX_FORWARD_SPEED = 360;
 var MAX_REVERSE_SPEED = -140;
+// Spin from knocks (e.g. car collisions) dies away at this rate
+var SPIN_DAMPING = 3;
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -36,12 +42,13 @@ export default function stepVehicle(car, controls, dt) {
     var forwardSpeed = velocityVec.dot(forward);
     var lateralSpeed = velocityVec.dot(right);
     var steerStep = (controls.steer === 0 ? STEER_RETURN_SPEED : STEER_SPEED) * dt;
-    var targetWheelRotation = controls.steer * MAX_STEER_ANGLE;
+    var maxSteerAngle = MAX_STEER_ANGLE / (1 + (Math.abs(forwardSpeed) / STEER_SPEED_FALLOFF));
     var drag = forwardSpeed >= 0 ? FORWARD_DRAG : REVERSE_DRAG;
     var yawRate;
     var nextVelocity;
 
-    car.wheel_rotation = moveTowards(car.wheel_rotation, targetWheelRotation, steerStep);
+    car.steerInput = moveTowards(car.steerInput, controls.steer, steerStep);
+    car.wheel_rotation = car.steerInput * maxSteerAngle;
 
     if (controls.throttle > 0) {
         forwardSpeed += controls.throttle * ENGINE_ACCELERATION * dt;
@@ -68,8 +75,9 @@ export default function stepVehicle(car, controls, dt) {
         yawRate = (forwardSpeed / car.wheelBase) * Math.tan(car.wheel_rotation) * STEERING_GRIP;
     }
 
-    car.angle += yawRate * dt;
-    car.angularVelocity = yawRate;
+    car.spin = moveTowards(car.spin, 0, SPIN_DAMPING * Math.abs(car.spin) * dt);
+    car.angle += (yawRate + car.spin) * dt;
+    car.angularVelocity = yawRate + car.spin;
     car.enginePower = controls.throttle - controls.brake;
 
     forward = Victor(0, -1).rotate(car.angle);

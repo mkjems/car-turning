@@ -1,25 +1,35 @@
 function createTrack() {
     var points = [];
-    var samples = 120;
+    var centerX = 600;
+    var centerY = 400;
+    var halfStraightX = 270;
+    var halfStraightY = 110;
+    var cornerRadius = 140;
+    var cornerSamples = 24;
+    var corners = [
+        { x: centerX + halfStraightX, y: centerY + halfStraightY, startAngle: 0 },
+        { x: centerX - halfStraightX, y: centerY + halfStraightY, startAngle: Math.PI / 2 },
+        { x: centerX - halfStraightX, y: centerY - halfStraightY, startAngle: Math.PI },
+        { x: centerX + halfStraightX, y: centerY - halfStraightY, startAngle: Math.PI * 1.5 }
+    ];
     var index;
+    var cornerIndex;
+    var corner;
     var angle;
-    var baseRadius;
-    var xRadius;
-    var yRadius;
-    var x;
-    var y;
 
-    for (index = 0; index < samples; index += 1) {
-        angle = (index / samples) * Math.PI * 2;
-        baseRadius = 1
-            + (0.18 * Math.sin((angle * 2) - 0.35))
-            + (0.09 * Math.cos((angle * 3) + 1.1))
-            + (0.05 * Math.sin((angle * 5) - 0.7));
-        xRadius = 255 * baseRadius * (1 + (0.08 * Math.cos((angle * 4) + 0.4)));
-        yRadius = 165 * baseRadius * (1 - (0.14 * Math.sin((angle * 3) - 0.9)));
-        x = 600 + (Math.cos(angle) * xRadius) + (28 * Math.sin((angle * 3) + 0.2));
-        y = 400 + (Math.sin(angle) * yRadius) + (18 * Math.cos((angle * 4) - 0.5));
-        points.push({ x: x, y: y });
+    // A rounded square: straights joined by quarter-circle corners.
+    // Starts mid-way down the right-hand straight and runs clockwise.
+    points.push({ x: centerX + halfStraightX + cornerRadius, y: centerY });
+
+    for (cornerIndex = 0; cornerIndex < corners.length; cornerIndex += 1) {
+        corner = corners[cornerIndex];
+        for (index = 0; index <= cornerSamples; index += 1) {
+            angle = corner.startAngle + ((index / cornerSamples) * (Math.PI / 2));
+            points.push({
+                x: corner.x + (Math.cos(angle) * cornerRadius),
+                y: corner.y + (Math.sin(angle) * cornerRadius)
+            });
+        }
     }
 
     return buildTrack(points, 70);
@@ -150,6 +160,41 @@ function getClosestProgress(track, point) {
     return bestMatch;
 }
 
+var WALL_BOUNCE = 0.6;
+var WALL_IMPACT_LOSS = 0.35;
+var WALL_DEFLECT = 0.6;
+
+function wrapAngle(angle) {
+    return Math.atan2(Math.sin(angle), Math.cos(angle));
+}
+
+// Only speed into the wall is lost; a glancing scrape keeps most of its pace
+function bounceOffWall(car, normal, normalSpeed) {
+    var speed = Math.sqrt((car.velocityVector.x * car.velocityVector.x) + (car.velocityVector.y * car.velocityVector.y));
+    var impactRatio = speed === 0 ? 0 : normalSpeed / speed;
+    var keep = 1 - (WALL_IMPACT_LOSS * impactRatio);
+    var forwardX = Math.sin(car.angle);
+    var forwardY = -Math.cos(car.angle);
+    var tangentX = -normal.y;
+    var tangentY = normal.x;
+    var tangentAngle;
+
+    car.velocityVector.x = (car.velocityVector.x - (normal.x * normalSpeed * (1 + WALL_BOUNCE))) * keep;
+    car.velocityVector.y = (car.velocityVector.y - (normal.y * normalSpeed * (1 + WALL_BOUNCE))) * keep;
+    car.angularVelocity *= 0.65;
+
+    // If the nose points into the wall, swing it towards running along the wall
+    // (whichever way it already leans) so the car doesn't keep driving into it
+    if ((forwardX * normal.x) + (forwardY * normal.y) > 0) {
+        if ((forwardX * tangentX) + (forwardY * tangentY) < 0) {
+            tangentX = -tangentX;
+            tangentY = -tangentY;
+        }
+        tangentAngle = Math.atan2(tangentX, -tangentY);
+        car.angle += wrapAngle(tangentAngle - car.angle) * WALL_DEFLECT * impactRatio;
+    }
+}
+
 function syncCarToTrack(car, track) {
     var closest = getClosestProgress(track, car);
     var previousProgress = typeof car.trackProgress === 'number' ? car.trackProgress : closest.progress;
@@ -162,13 +207,9 @@ function syncCarToTrack(car, track) {
 
         normalSpeed = (car.velocityVector.x * closest.normal.x) + (car.velocityVector.y * closest.normal.y);
         if (normalSpeed > 0) {
-            car.velocityVector.x -= closest.normal.x * normalSpeed * 1.35;
-            car.velocityVector.y -= closest.normal.y * normalSpeed * 1.35;
+            bounceOffWall(car, closest.normal, normalSpeed);
         }
 
-        car.velocityVector.x *= 0.72;
-        car.velocityVector.y *= 0.72;
-        car.angularVelocity *= 0.65;
         closest = getClosestProgress(track, car);
     }
 
@@ -176,7 +217,8 @@ function syncCarToTrack(car, track) {
         car.lap += 1;
     }
 
-    if ((closest.progress - previousProgress) > (track.totalLength / 2) && car.lap > 0) {
+    // Reversing back over the start line (even before the first lap) undoes a lap
+    if ((closest.progress - previousProgress) > (track.totalLength / 2)) {
         car.lap -= 1;
     }
 

@@ -1,18 +1,13 @@
 import Store from './Store.js';
 import Keys from './Keys.js';
 import getAIControls from './ai/getAIControls.js';
+import collideCars from './physics/collideCars.js';
 import stepVehicle from './physics/stepVehicle.js';
 import * as track from './track/track.js';
 import * as View from './View.js';
 
-import * as timer from './timer.js';
-
-var store = new Store();
-var keys = new Keys();
 var FIXED_TIMESTEP = 1 / 120;
 var MAX_FRAME_TIME = 0.1;
-var accumulator = 0;
-var previousTimestamp;
 
 function updateRaceOrder(state) {
 	var orderedCars = state.cars.slice().sort(function(a, b) {
@@ -27,39 +22,68 @@ function updateRaceOrder(state) {
 	state.stats.leader = orderedCars[0].name;
 }
 
-function updateWorld(state, dt) {
+function updateWorld(state, keys, dt) {
 	stepVehicle(state.cars[0], keys.getControls(), dt);
-	track.syncCarToTrack(state.cars[0], state.track);
+	stepVehicle(state.cars[1], getAIControls(state.cars[1], state.track, [state.cars[0]], dt), dt);
 
-	stepVehicle(state.cars[1], getAIControls(state.cars[1], state.track), dt);
+	collideCars(state.cars[0], state.cars[1]);
+
+	track.syncCarToTrack(state.cars[0], state.track);
 	track.syncCarToTrack(state.cars[1], state.track);
 
 	updateRaceOrder(state);
 }
 
-/* Game loop */
-function step(timestamp) {
-	var state = store.getCurrentState();
-	var frameTime;
+// One self-contained race drawing into `canvas`, driven by arrow keys pressed on `keyTarget`
+export default function createGame(canvas, keyTarget) {
+	var ctx = canvas.getContext('2d');
+	var store = new Store();
+	var keys = new Keys(keyTarget);
+	var accumulator = 0;
+	var previousTimestamp;
+	var frameId = null;
 
-	if (previousTimestamp === undefined) {
+	function step(timestamp) {
+		var state = store.getCurrentState();
+		var frameTime;
+
+		if (previousTimestamp === undefined) {
+			previousTimestamp = timestamp;
+		}
+
+		frameTime = Math.min((timestamp - previousTimestamp) / 1000, MAX_FRAME_TIME);
 		previousTimestamp = timestamp;
+		accumulator += frameTime;
+
+		while (accumulator >= FIXED_TIMESTEP) {
+			updateWorld(state, keys, FIXED_TIMESTEP);
+			accumulator -= FIXED_TIMESTEP;
+		}
+
+		state.stats.focused = keyTarget.matches(':focus');
+		View.renderFrame(ctx, state);
+		store.preserveState(state);
+		frameId = window.requestAnimationFrame(step);
 	}
 
-	timer.FrameBegin();
-	frameTime = Math.min((timestamp - previousTimestamp) / 1000, MAX_FRAME_TIME);
-	previousTimestamp = timestamp;
-	accumulator += frameTime;
-
-	while (accumulator >= FIXED_TIMESTEP) {
-		updateWorld(state, FIXED_TIMESTEP);
-		accumulator -= FIXED_TIMESTEP;
-	}
-
-	View.renderFrame(state);
-	store.preserveState(state);
-	timer.FrameEnd();
-    window.requestAnimationFrame(step);
+	return {
+		start: function() {
+			if (frameId === null) {
+				// Don't fast-forward through the time we were paused
+				previousTimestamp = undefined;
+				frameId = window.requestAnimationFrame(step);
+			}
+		},
+		stop: function() {
+			if (frameId !== null) {
+				window.cancelAnimationFrame(frameId);
+				frameId = null;
+			}
+			keys.releaseAll();
+		},
+		destroy: function() {
+			this.stop();
+			keys.destroy();
+		}
+	};
 }
-
-window.requestAnimationFrame(step);

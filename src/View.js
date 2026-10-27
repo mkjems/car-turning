@@ -1,118 +1,97 @@
 import Car from './Car.js';
 import * as track from './track/track.js';
 
-// Setup
-var canvasElm = document.getElementById("game_canvas");
+// The car renderer holds only drawing dimensions, so every car (and every game) can share it
+var carRenderer = new Car();
 
-var ctx = canvasElm.getContext("2d");
-
-var carRenderers = [];
-
-
-function clearFrame() {
-	ctx.fillStyle = '#7fb069';
-	ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
+function clearFrame(ctx) {
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function ensureCarRenderers(cars) {
-	while (carRenderers.length < cars.length) {
-		carRenderers.push(new Car());
+function traceTrackPath(ctx, trackState) {
+	var index;
+
+	ctx.beginPath();
+	for (index = 0; index < trackState.points.length; index += 1) {
+		if (index === 0) {
+			ctx.moveTo(trackState.points[index].x, trackState.points[index].y);
+		} else {
+			ctx.lineTo(trackState.points[index].x, trackState.points[index].y);
+		}
 	}
+	ctx.closePath();
 }
 
-function drawTrack(trackState) {
+function drawTrack(ctx, trackState) {
 	var startLineCenter = track.getPointAtDistance(trackState, 0);
 	var startLineAngle = track.getHeadingAtDistance(trackState, 0);
 	var rightX = Math.cos(startLineAngle);
 	var rightY = Math.sin(startLineAngle);
-	var index;
+	var startLineHalf = trackState.halfWidth - 4;
 
 	ctx.save();
 		ctx.lineJoin = 'round';
 		ctx.lineCap = 'round';
 
-		ctx.beginPath();
-		for (index = 0; index < trackState.points.length; index += 1) {
-			if (index === 0) {
-				ctx.moveTo(trackState.points[index].x, trackState.points[index].y);
-			} else {
-				ctx.lineTo(trackState.points[index].x, trackState.points[index].y);
-			}
-		}
-		ctx.closePath();
-		ctx.strokeStyle = '#f8fafc';
-		ctx.lineWidth = (trackState.halfWidth * 2) + 10;
+		// Single thin edge, then the light road surface over it
+		traceTrackPath(ctx, trackState);
+		ctx.strokeStyle = '#bbbbbb';
+		ctx.lineWidth = (trackState.halfWidth * 2) + 2;
 		ctx.stroke();
-
-		ctx.beginPath();
-		for (index = 0; index < trackState.points.length; index += 1) {
-			if (index === 0) {
-				ctx.moveTo(trackState.points[index].x, trackState.points[index].y);
-			} else {
-				ctx.lineTo(trackState.points[index].x, trackState.points[index].y);
-			}
-		}
-		ctx.closePath();
-		ctx.strokeStyle = '#5f6870';
+		ctx.strokeStyle = '#eeeeee';
 		ctx.lineWidth = trackState.halfWidth * 2;
 		ctx.stroke();
 
-		ctx.beginPath();
-		for (index = 0; index < trackState.points.length; index += 1) {
-			if (index === 0) {
-				ctx.moveTo(trackState.points[index].x, trackState.points[index].y);
-			} else {
-				ctx.lineTo(trackState.points[index].x, trackState.points[index].y);
-			}
-		}
-		ctx.closePath();
-		ctx.setLineDash([16, 14]);
-		ctx.strokeStyle = '#f4d35e';
-		ctx.lineWidth = 3;
+		// Centre line
+		ctx.setLineDash([14, 14]);
+		ctx.strokeStyle = '#cccccc';
+		ctx.lineWidth = 1;
 		ctx.stroke();
 		ctx.setLineDash([]);
 
-		ctx.strokeStyle = '#111827';
-		ctx.lineWidth = 8;
+		// Start line
+		ctx.strokeStyle = '#999999';
+		ctx.lineWidth = 2;
+		ctx.lineCap = 'butt';
 		ctx.beginPath();
-		ctx.moveTo(startLineCenter.x - (rightX * (trackState.halfWidth - 6)), startLineCenter.y - (rightY * (trackState.halfWidth - 6)));
-		ctx.lineTo(startLineCenter.x + (rightX * (trackState.halfWidth - 6)), startLineCenter.y + (rightY * (trackState.halfWidth - 6)));
+		ctx.moveTo(startLineCenter.x - (rightX * startLineHalf), startLineCenter.y - (rightY * startLineHalf));
+		ctx.lineTo(startLineCenter.x + (rightX * startLineHalf), startLineCenter.y + (rightY * startLineHalf));
 		ctx.stroke();
 	ctx.restore();
 }
 
-function drawCars(state) {
+function drawCars(ctx, state) {
 	var index;
 
-	ensureCarRenderers(state.cars);
-
 	for (index = 0; index < state.cars.length; index += 1) {
-		carRenderers[index].draw(state.cars[index], ctx);
+		carRenderer.draw(state.cars[index], ctx);
 	}
 }
 
-function drawHud(state) {
+function drawHud(ctx, state) {
+	var left = 16;
+	var top = 0;
+
 	ctx.save();
-		ctx.fillStyle = 'rgba(15, 23, 42, 0.86)';
-		ctx.fillRect(18, 18, 250, 108);
-		ctx.fillStyle = '#f8fafc';
+		ctx.fillStyle = '#222222';
 		ctx.font = '16px sans-serif';
-		ctx.fillText('Tiny Track Cup', 34, 44);
+		ctx.fillText('Tiny Track Cup', left, top + 26);
 		ctx.font = '13px sans-serif';
-		ctx.fillText('Leader: ' + state.stats.leader, 34, 68);
-		ctx.fillText('You lap: ' + (state.cars[0].lap + 1), 34, 88);
-		ctx.fillText('You place: ' + state.cars[0].place + '/' + state.cars.length, 34, 108);
-		ctx.fillText('Arrow keys to drive', 34, 128);
+		ctx.fillText('Leader: ' + state.stats.leader, left, top + 50);
+		ctx.fillText('You lap: ' + Math.max(1, state.cars[0].lap + 1), left, top + 70);
+		ctx.fillText('You place: ' + state.cars[0].place + '/' + state.cars.length, left, top + 90);
+		ctx.fillText(state.stats.focused ? 'Arrow keys to drive' : 'Click here to drive', left, top + 110);
 	ctx.restore();
 }
 
 
 // Render everything
-function renderFrame(state) {
-	clearFrame();
-	drawTrack(state.track);
-	drawCars(state);
-	drawHud(state);
+function renderFrame(ctx, state) {
+	clearFrame(ctx);
+	drawTrack(ctx, state.track);
+	drawCars(ctx, state);
+	drawHud(ctx, state);
 }
 
-export { carRenderers, renderFrame };
+export { renderFrame };
